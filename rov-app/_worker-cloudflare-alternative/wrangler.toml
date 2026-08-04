@@ -1,0 +1,28 @@
+name = "rov-worker"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# ---- configuration (edit these) ----
+[vars]
+# Lock CORS to your GitHub Pages origin. During local dev you can temporarily
+# set this to "*" but DO NOT ship with "*".
+ALLOWED_ORIGIN = "https://YOURNAME.github.io"
+
+# Model + generation settings (swappable without code changes)
+ANTHROPIC_MODEL = "claude-sonnet-4-6"
+MAX_TOKENS = "8000"
+
+# Rate limiting, tuned for a small team (2-10 people).
+# Requests allowed per rolling window, per client IP.
+RATE_LIMIT_MAX = "40"
+RATE_LIMIT_WINDOW_SECONDS = "3600"
+
+# ---- secrets (NOT set here; use the CLI) ----
+# wrangler secret put ANTHROPIC_API_KEY
+
+# ---- rate-limit storage ----
+# The simple in-memory limiter in index.js needs no binding. For a durable,
+# multi-instance limiter, uncomment and create a KV namespace:
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT_KV"
+# id = "REPLACE_WITH_KV_ID"
