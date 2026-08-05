@@ -37,6 +37,8 @@ export default function App() {
   const [showNotes, setShowNotes] = useState(false);
   const [editingRov, setEditingRov] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [manualDistances, setManualDistances] = useState({}); // { "CMP-01": "3.2" }
+  const [needsManual, setNeedsManual] = useState([]);          // [{ tag, address }]
   const [errMsg, setErrMsg] = useState("");
   const [triedRun, setTriedRun] = useState(false);
   const [dragIdx, setDragIdx] = useState(null);
@@ -111,15 +113,17 @@ export default function App() {
 
   // Shared streaming call. Streams markdown in and splits it live into { rov, notes }.
   const generate = async () => {
-    await runRov({
+    const { needsManual: nm } = await runRov({
       caseInfo,
       files: buildFiles(),
       ledgerText: buildLedger(),
+      manualDistances,
       onToken: (full) => {
         const { rov, notes } = splitRov(full);
         setResult({ rov, notes });
       },
     });
+    setNeedsManual(nm || []);
   };
 
   const runAnalysis = async () => {
@@ -424,6 +428,36 @@ export default function App() {
             <ConfidenceHeader t={t}
               comps={comps.length} addrs={addressComps.length}
               hasPrior={!!priorAppraisal} target={caseInfo.targetRange} />
+
+            {needsManual.length > 0 && (
+              <div style={t.manualPanel}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <MapPin size={14} style={{ color: t.accent2 }} />
+                  <span style={{ fontWeight: 700, fontSize: 13 }}>Distances need confirmation</span>
+                </div>
+                <div style={{ fontSize: 12, color: t.muted, marginBottom: 10, lineHeight: 1.5 }}>
+                  These comps couldn't be geocoded to a precise address. Enter the straight-line distance from the subject (miles, e.g. 3.2) and recompute — the report will use your figures.
+                </div>
+                {needsManual.map((nm) => (
+                  <div key={nm.tag} style={t.manualRow}>
+                    <span style={t.chipTag}>{nm.tag}</span>
+                    <span style={{ flex: 1, fontSize: 12, color: t.text, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={nm.address}>{nm.address || "(address not found)"}</span>
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <input
+                        value={manualDistances[nm.tag] || ""}
+                        onChange={(e) => setManualDistances((m) => ({ ...m, [nm.tag]: e.target.value.replace(/[^0-9.]/g, "") }))}
+                        placeholder="0.0"
+                        style={t.manualInput} />
+                      <span style={t.manualUnit}>mi</span>
+                    </div>
+                  </div>
+                ))}
+                <button style={{ ...t.runBtn, marginTop: 10 }} disabled={status === "running"}
+                  onClick={regenerate}>
+                  {status === "running" ? <><Loader2 size={14} className="spin" /> Recomputing…</> : <><RefreshCw size={14} /> Recompute with distances</>}
+                </button>
+              </div>
+            )}
 
             <div style={t.rovDoc}>
               {editingRov ? (
@@ -895,6 +929,10 @@ function tokens(dark) {
 
     /* ROV document */
     rovDoc: { background: c.panel, border: `1px solid ${c.border}`, borderRadius: 14, padding: "28px 32px" },
+    manualPanel: { background: c.accent2Soft, border: `1px solid ${accent2}55`, borderRadius: 12, padding: "14px 16px" },
+    manualRow: { display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderTop: `1px solid ${accent2}22` },
+    manualInput: { width: 64, padding: "6px 22px 6px 8px", borderRadius: 7, border: `1px solid ${c.border}`, background: c.panel, color: c.text, fontFamily: mono, fontSize: 13, textAlign: "right", boxSizing: "border-box" },
+    manualUnit: { position: "absolute", right: 8, fontSize: 11, color: c.muted, pointerEvents: "none" },
     mdH: { fontWeight: 750, letterSpacing: "-0.01em", color: c.text, marginBottom: 8 },
     mdP: { fontSize: 13.5, lineHeight: 1.62, color: c.text, margin: "0 0 11px" },
     mdHr: { border: "none", borderTop: `1px solid ${c.border}`, margin: "20px 0" },
