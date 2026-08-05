@@ -168,7 +168,12 @@ export default function App() {
 
       <header style={t.header}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={t.mark}>ROV</div>
+          <img
+            src={`${import.meta.env.BASE_URL}moxie-logo.png`}
+            alt="Moxie"
+            style={t.logo}
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
           <div style={{ fontWeight: 700, letterSpacing: "-0.01em", fontSize: 15 }}>
             Reconsideration of Value Assistant
           </div>
@@ -773,6 +778,7 @@ function tokens(dark) {
       color: "#fff", borderRadius: 8, padding: "7px 10px",
       background: `linear-gradient(135deg, ${accent}, ${accent2})`,
     },
+    logo: { height: 32, width: "auto", display: "block", objectFit: "contain" },
     iconBtn: {
       background: "transparent", border: `1px solid ${c.headerBorder}`, color: c.headerText,
       borderRadius: 9, width: 36, height: 36, cursor: "pointer", display: "grid", placeItems: "center",
