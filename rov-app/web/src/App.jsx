@@ -19,6 +19,12 @@ const COMP_IDEAL = 5;       // ideal
 const uid = () => Math.random().toString(36).slice(2, 9);
 
 export default function App() {
+  const ACCESS_CODE = "5215";
+  const [unlocked, setUnlocked] = useState(() => {
+    try { return sessionStorage.getItem("rov_unlocked") === "1"; } catch { return false; }
+  });
+  const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState(false);
   const [dark, setDark] = useState(true);
   const [appraisal, setAppraisal] = useState(null);      // { name, size }
   const [comps, setComps] = useState([]);                 // [{ id, name, size }]
@@ -161,6 +167,54 @@ export default function App() {
     requiredAdvanced.every((k) => caseInfo[k].trim());
   const canRun = appraisal && caseComplete && status !== "running";
   const evidenceCount = (appraisal ? 1 : 0) + comps.length + addressComps.length + (priorAppraisal ? 1 : 0);
+
+  const submitCode = () => {
+    if (codeInput.trim() === ACCESS_CODE) {
+      try { sessionStorage.setItem("rov_unlocked", "1"); } catch {}
+      setUnlocked(true); setCodeError(false);
+    } else {
+      setCodeError(true);
+    }
+  };
+
+  if (!unlocked) {
+    return (
+      <div style={{ ...t.page, minHeight: "100vh", fontFamily: t.sans, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <style>{globalCss(t)}</style>
+        <div style={t.gateCard}>
+          <img
+            src={`${import.meta.env.BASE_URL}moxie-logo.png`}
+            alt="Moxie"
+            style={{ height: 34, width: "auto", display: "block", margin: "0 auto 18px" }}
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
+          <div style={{ fontWeight: 700, fontSize: 17, textAlign: "center", marginBottom: 6, color: t.text }}>
+            Reconsideration of Value Assistant
+          </div>
+          <div style={{ fontSize: 13, color: t.muted, textAlign: "center", marginBottom: 20, lineHeight: 1.5 }}>
+            Enter the access code to continue.
+          </div>
+          <input
+            type="password"
+            value={codeInput}
+            onChange={(e) => { setCodeInput(e.target.value); setCodeError(false); }}
+            onKeyDown={(e) => { if (e.key === "Enter") submitCode(); }}
+            placeholder="Access code"
+            autoFocus
+            style={{ ...t.gateInput, ...(codeError ? { borderColor: t.accent2 } : {}) }}
+          />
+          {codeError && (
+            <div style={{ fontSize: 12, color: t.accent2, marginTop: 8, textAlign: "center" }}>
+              Incorrect code. Try again.
+            </div>
+          )}
+          <button style={{ ...t.runBtn, width: "100%", justifyContent: "center", marginTop: 16 }} onClick={submitCode}>
+            Unlock
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ ...t.page, minHeight: "100vh", fontFamily: t.sans }}>
@@ -787,6 +841,8 @@ function tokens(dark) {
       background: `linear-gradient(135deg, ${accent}, ${accent2})`,
     },
     logo: { height: 32, width: "auto", display: "block", objectFit: "contain" },
+    gateCard: { background: c.panel, border: `1px solid ${c.border}`, borderRadius: 16, padding: "32px 28px", width: "100%", maxWidth: 360, boxSizing: "border-box" },
+    gateInput: { width: "100%", padding: "11px 13px", borderRadius: 9, border: `1px solid ${c.border}`, background: c.panel2, color: c.text, fontFamily: mono, fontSize: 15, letterSpacing: "0.1em", textAlign: "center", boxSizing: "border-box", outline: "none" },
     iconBtn: {
       background: "transparent", border: `1px solid ${c.headerBorder}`, color: c.headerText,
       borderRadius: 9, width: 36, height: 36, cursor: "pointer", display: "grid", placeItems: "center",
