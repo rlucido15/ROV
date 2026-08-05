@@ -39,7 +39,7 @@ function fileToBase64(file) {
  *                             API-compat with the streaming version so App.jsx works unchanged)
  * @returns {Promise<string>} the ROV markdown
  */
-export async function runRov({ caseInfo, files, ledgerText, onToken }) {
+export async function runRov({ caseInfo, files, ledgerText, manualDistances, onToken }) {
   const documents = [];
   for (const { tag, file } of files) {
     if (!file) continue;
@@ -64,6 +64,7 @@ export async function runRov({ caseInfo, files, ledgerText, onToken }) {
       caseInfo,
       documents,
       ledgerText,
+      manualDistances: manualDistances || {},
     }),
     redirect: "follow", // Apps Script /exec issues a redirect to the content URL
   });
@@ -79,7 +80,7 @@ export async function runRov({ caseInfo, files, ledgerText, onToken }) {
   if (data.error) throw new Error(data.error);
   const rov = data.rov || "";
   if (onToken) onToken(rov); // single callback so App.jsx's splitRov path still runs
-  return rov;
+  return { rov, needsManual: data.needsManual || [] };
 }
 
 /** Health check against the Apps Script /exec URL (GET). */
