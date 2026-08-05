@@ -810,11 +810,11 @@ function tokens(dark) {
     ? { bg: "#0b1016", header: "#111820", headerText: "#e8eef4", headerBorder: "#232f3d",
         panel: "#eef1f5", panel2: "#e2e7ee", border: "#cdd5df",
         text: "#141b24", muted: "#556072", accentSoft: "#d6eef4", accent2Soft: "#fce2db",
-        dot: "rgba(255,255,255,0.06)" }
+        dot: "rgba(255,255,255,0.14)" }
     : { bg: "#f4f7fa", header: "#ffffff", headerText: "#0f1720", headerBorder: "#dce3ec",
         panel: "#ffffff", panel2: "#eef2f7", border: "#dce3ec",
         text: "#0f1720", muted: "#5a6878", accentSoft: "#e2f5f9", accent2Soft: "#fdece7",
-        dot: "rgba(15,23,32,0.06)" };
+        dot: "rgba(15,23,32,0.12)" };
   const sans = "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
   const mono = "'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace";
   const chipTag = {
@@ -825,7 +825,7 @@ function tokens(dark) {
     ...c, accent, accent2, sans, mono, chipTag,
     page: {
       background: c.bg,
-      backgroundImage: `radial-gradient(${c.dot} 1px, transparent 1px)`,
+      backgroundImage: `radial-gradient(${c.dot} 1.5px, transparent 1.5px)`,
       backgroundSize: "22px 22px",
       backgroundPosition: "-1px -1px",
       color: c.text,
@@ -847,7 +847,7 @@ function tokens(dark) {
       background: "transparent", border: `1px solid ${c.headerBorder}`, color: c.headerText,
       borderRadius: 9, width: 36, height: 36, cursor: "pointer", display: "grid", placeItems: "center",
     },
-    shell: { display: "flex", flexDirection: "column", gap: 16, maxWidth: 1080, margin: "0 auto", padding: 22 },
+    shell: { display: "flex", flexDirection: "column", gap: 16, maxWidth: 1280, margin: "0 auto", padding: 22 },
 
     /* hero / case facts */
     heroCard: {
