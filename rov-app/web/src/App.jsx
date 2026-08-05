@@ -755,10 +755,12 @@ function tokens(dark) {
   const c = dark
     ? { bg: "#0b1016", header: "#111820", headerText: "#e8eef4", headerBorder: "#232f3d",
         panel: "#eef1f5", panel2: "#e2e7ee", border: "#cdd5df",
-        text: "#141b24", muted: "#556072", accentSoft: "#d6eef4", accent2Soft: "#fce2db" }
+        text: "#141b24", muted: "#556072", accentSoft: "#d6eef4", accent2Soft: "#fce2db",
+        dot: "rgba(255,255,255,0.06)" }
     : { bg: "#f4f7fa", header: "#ffffff", headerText: "#0f1720", headerBorder: "#dce3ec",
         panel: "#ffffff", panel2: "#eef2f7", border: "#dce3ec",
-        text: "#0f1720", muted: "#5a6878", accentSoft: "#e2f5f9", accent2Soft: "#fdece7" };
+        text: "#0f1720", muted: "#5a6878", accentSoft: "#e2f5f9", accent2Soft: "#fdece7",
+        dot: "rgba(15,23,32,0.06)" };
   const sans = "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
   const mono = "'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace";
   const chipTag = {
@@ -767,7 +769,13 @@ function tokens(dark) {
   };
   return {
     ...c, accent, accent2, sans, mono, chipTag,
-    page: { background: c.bg, color: c.text },
+    page: {
+      background: c.bg,
+      backgroundImage: `radial-gradient(${c.dot} 1px, transparent 1px)`,
+      backgroundSize: "22px 22px",
+      backgroundPosition: "-1px -1px",
+      color: c.text,
+    },
     header: {
       display: "flex", justifyContent: "space-between", alignItems: "center",
       padding: "14px 24px", borderBottom: `1px solid ${c.headerBorder}`,
@@ -964,7 +972,7 @@ function tokens(dark) {
 function globalCss(t) {
   return `
     * { box-sizing: border-box; }
-    body { margin: 0; }
+    body { margin: 0; background: ${t.bg}; }
     .spin { animation: spin 0.9s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     input:focus, select:focus, textarea:focus { outline: 2px solid ${t.accent}55; outline-offset: 1px; }
